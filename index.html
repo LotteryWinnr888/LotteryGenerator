@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lotto Generator</title>
+  <style>
+    body { font-family: Arial; padding: 20px; background: #f4f4f4; }
+    .hidden { display: none; }
+    button { padding: 10px 20px; margin-top: 10px; }
+    .animated { transition: transform 0.2s ease-in-out; }
+    .animated:hover { transform: scale(1.05); }
+  </style>
+</head>
+<body>
+
+  <h2 id="title">Select Language</h2>
+  <select id="languageSelector">
+    <option value="de">Deutsch</option>
+    <option value="tr">Türkçe</option>
+    <option value="en">English</option>
+  </select>
+
+  <div id="userInput" class="hidden">
+    <p id="favNumberLabel"></p>
+    <input type="number" id="favNumber" />
+    
+    <p id="favColorLabel"></p>
+    <input type="text" id="favColor" />
+
+    <p id="favLetterLabel"></p>
+    <input type="text" id="favLetter" maxlength="1" />
+
+    <button onclick="showOptions()" class="animated" id="continueBtn"></button>
+  </div>
+
+  <div id="lottoOptions" class="hidden">
+    <p id="selectGameLabel"></p>
+    <select id="gameSelector">
+      <option value="sans">Sans Topu</option>
+      <option value="super">Süper Loto</option>
+      <option value="sayisal">Sayisal Loto</option>
+      <option value="deLotto">Deutschland Lotto</option>
+      <option value="eurojackpot">Eurojackpot</option>
+    </select>
+    <button onclick="generateNumbers()" class="animated" id="generateBtn"></button>
+  </div>
+
+  <h3 id="result" style="margin-top: 20px;"></h3>
+
+<script>
+  const texts = {
+    de: {
+      title: "Sprache wählen",
+      favNumberLabel: "Gib deine Lieblingszahl ein:",
+      favColorLabel: "Gib deine Lieblingsfarbe ein:",
+      favLetterLabel: "Gib deinen Lieblingsbuchstaben ein:",
+      continueBtn: "Weiter",
+      selectGameLabel: "Wähle ein Spiel:",
+      generateBtn: "Zahlen generieren",
+      resultPrefix: "Deine generierten Zahlen:"
+    },
+    tr: {
+      title: "Dil Seçiniz",
+      favNumberLabel: "Favori sayınızı girin:",
+      favColorLabel: "Favori renginizi girin:",
+      favLetterLabel: "Favori harfinizi girin:",
+      continueBtn: "Devam et",
+      selectGameLabel: "Oyun seçiniz:",
+      generateBtn: "Sayıları üret",
+      resultPrefix: "Oluşturulan sayılar:"
+    },
+    en: {
+      title: "Select Language",
+      favNumberLabel: "Enter your favorite number:",
+      favColorLabel: "Enter your favorite color:",
+      favLetterLabel: "Enter your favorite letter:",
+      continueBtn: "Continue",
+      selectGameLabel: "Select a game:",
+      generateBtn: "Generate Numbers",
+      resultPrefix: "Your generated numbers:"
+    }
+  };
+
+  let lang = "en";
+
+  document.getElementById("languageSelector").addEventListener("change", (e) => {
+    lang = e.target.value;
+    const t = texts[lang];
+    document.getElementById("title").innerText = t.title;
+    document.getElementById("favNumberLabel").innerText = t.favNumberLabel;
+    document.getElementById("favColorLabel").innerText = t.favColorLabel;
+    document.getElementById("favLetterLabel").innerText = t.favLetterLabel;
+    document.getElementById("continueBtn").innerText = t.continueBtn;
+    document.getElementById("selectGameLabel").innerText = t.selectGameLabel;
+    document.getElementById("generateBtn").innerText = t.generateBtn;
+
+    document.getElementById("userInput").classList.remove("hidden");
+  });
+
+  function showOptions() {
+    const favNum = document.getElementById("favNumber").value;
+    const favColor = document.getElementById("favColor").value;
+    const favLetter = document.getElementById("favLetter").value;
+
+    if (favNum && favColor && favLetter) {
+      document.getElementById("lottoOptions").classList.remove("hidden");
+    } else {
+      alert("Bitte alle Felder ausfüllen!");
+    }
+  }
+
+  function generateNumbers() {
+    const game = document.getElementById("gameSelector").value;
+
+    let config = {};
+    if (game === "sans") config = { count: 5, range: 34, super: [1, 14] };
+    if (game === "super") config = { count: 6, range: 60 };
+    if (game === "sayisal") config = { count: 6, range: 90, super: [1, 90] };
+    if (game === "deLotto") config = { count: 6, range: 49, super: [0, 9] };
+    if (game === "eurojackpot") config = { count: 5, range: 50, super: [1, 12, 2] };
+
+    let numbers = [];
+
+    while (numbers.length < config.count) {
+      let num = Math.floor(Math.random() * config.range) + 1;
+      if (!numbers.includes(num)) numbers.push(num);
+    }
+
+    // Randomize each number with ±1–19, but check bounds
+    numbers = numbers.map(n => {
+      let offset = Math.floor(Math.random() * 39) - 19; // range -19 to +19
+      let newVal = n + offset;
+      while (newVal < 1 || newVal > config.range) {
+        offset = Math.floor(Math.random() * 39) - 19;
+        newVal = n + offset;
+      }
+      return newVal;
+    });
+
+    let superNumbers = [];
+    if (config.super) {
+      const superRange = config.super[1];
+      const count = config.super[2] || 1;
+      while (superNumbers.length < count) {
+        let sn = Math.floor(Math.random() * superRange) + config.super[0];
+        if (!superNumbers.includes(sn)) superNumbers.push(sn);
+      }
+    }
+
+    document.getElementById("result").innerText = texts[lang].resultPrefix + " " +
+      numbers.join("-") + (superNumbers.length ? " + " + superNumbers.join(",") : "");
+  }
+</script>
+</body>
+</html>
