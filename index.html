@@ -1,41 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lotto Generator</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lottozahlen Generator</title>
   <style>
-    body { font-family: Arial; padding: 20px; background: #f4f4f4; }
-    .hidden { display: none; }
-    button { padding: 10px 20px; margin-top: 10px; }
-    .animated { transition: transform 0.2s ease-in-out; }
-    .animated:hover { transform: scale(1.05); }
+    body {
+      background-color: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+    }
+
+    h1, h3 {
+      color: #fff;
+    }
+
+    #gameSelector, #languageSelector {
+      font-size: 16px;
+      margin: 10px 0;
+    }
+
+    .lotto-ball {
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      margin: 5px;
+      border-radius: 50%;
+      background-color: #ff6347;
+      color: white;
+      font-size: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .lotto-ball.gold {
+      background-color: #ffd700;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #gameSection, #resultSection {
+      display: none;
+    }
   </style>
 </head>
 <body>
 
-  <h2 id="title">Select Language</h2>
-  <select id="languageSelector">
-    <option value="de">Deutsch</option>
-    <option value="tr">Türkçe</option>
-    <option value="en">English</option>
-  </select>
+  <h1>Lottozahlen Generator</h1>
 
-  <div id="userInput" class="hidden">
-    <p id="favNumberLabel"></p>
-    <input type="number" id="favNumber" />
-    
-    <p id="favColorLabel"></p>
-    <input type="text" id="favColor" />
-
-    <p id="favLetterLabel"></p>
-    <input type="text" id="favLetter" maxlength="1" />
-
-    <button onclick="showOptions()" class="animated" id="continueBtn"></button>
+  <!-- Sprache Auswahl -->
+  <div id="languageSelection">
+    <label for="languageSelector">Wählen Sie Ihre Sprache:</label>
+    <select id="languageSelector">
+      <option value="de">Deutsch</option>
+      <option value="tr">Türkçe</option>
+      <option value="en">English</option>
+    </select>
+    <button id="languageBtn">Sprache wählen</button>
   </div>
 
-  <div id="lottoOptions" class="hidden">
-    <p id="selectGameLabel"></p>
+  <!-- Das Dropdown und der Button zum Generieren werden erst nach der Sprachwahl angezeigt -->
+  <div id="gameSection">
+    <label for="gameSelector" id="gameLabel">Wählen Sie ein Spiel:</label>
     <select id="gameSelector">
       <option value="sans">Sans Topu</option>
       <option value="super">Süper Loto</option>
@@ -43,114 +84,110 @@
       <option value="deLotto">Deutschland Lotto</option>
       <option value="eurojackpot">Eurojackpot</option>
     </select>
-    <button onclick="generateNumbers()" class="animated" id="generateBtn"></button>
+
+    <div id="resultSection">
+      <div id="result"></div>
+    </div>
+
+    <button id="generateBtn">Generiere Lottozahlen</button>
   </div>
 
-  <h3 id="result" style="margin-top: 20px;"></h3>
-
-<script>
-  const texts = {
-    de: {
-      title: "Sprache wählen",
-      favNumberLabel: "Gib deine Lieblingszahl ein:",
-      favColorLabel: "Gib deine Lieblingsfarbe ein:",
-      favLetterLabel: "Gib deinen Lieblingsbuchstaben ein:",
-      continueBtn: "Weiter",
-      selectGameLabel: "Wähle ein Spiel:",
-      generateBtn: "Zahlen generieren",
-      resultPrefix: "Deine generierten Zahlen:"
-    },
-    tr: {
-      title: "Dil Seçiniz",
-      favNumberLabel: "Favori sayınızı girin:",
-      favColorLabel: "Favori renginizi girin:",
-      favLetterLabel: "Favori harfinizi girin:",
-      continueBtn: "Devam et",
-      selectGameLabel: "Oyun seçiniz:",
-      generateBtn: "Sayıları üret",
-      resultPrefix: "Oluşturulan sayılar:"
-    },
-    en: {
-      title: "Select Language",
-      favNumberLabel: "Enter your favorite number:",
-      favColorLabel: "Enter your favorite color:",
-      favLetterLabel: "Enter your favorite letter:",
-      continueBtn: "Continue",
-      selectGameLabel: "Select a game:",
-      generateBtn: "Generate Numbers",
-      resultPrefix: "Your generated numbers:"
-    }
-  };
-
-  let lang = "en";
-
-  document.getElementById("languageSelector").addEventListener("change", (e) => {
-    lang = e.target.value;
-    const t = texts[lang];
-    document.getElementById("title").innerText = t.title;
-    document.getElementById("favNumberLabel").innerText = t.favNumberLabel;
-    document.getElementById("favColorLabel").innerText = t.favColorLabel;
-    document.getElementById("favLetterLabel").innerText = t.favLetterLabel;
-    document.getElementById("continueBtn").innerText = t.continueBtn;
-    document.getElementById("selectGameLabel").innerText = t.selectGameLabel;
-    document.getElementById("generateBtn").innerText = t.generateBtn;
-
-    document.getElementById("userInput").classList.remove("hidden");
-  });
-
-  function showOptions() {
-    const favNum = document.getElementById("favNumber").value;
-    const favColor = document.getElementById("favColor").value;
-    const favLetter = document.getElementById("favLetter").value;
-
-    if (favNum && favColor && favLetter) {
-      document.getElementById("lottoOptions").classList.remove("hidden");
-    } else {
-      alert("Bitte alle Felder ausfüllen!");
-    }
-  }
-
-  function generateNumbers() {
-    const game = document.getElementById("gameSelector").value;
-
-    let config = {};
-    if (game === "sans") config = { count: 5, range: 34, super: [1, 14] };
-    if (game === "super") config = { count: 6, range: 60 };
-    if (game === "sayisal") config = { count: 6, range: 90, super: [1, 90] };
-    if (game === "deLotto") config = { count: 6, range: 49, super: [0, 9] };
-    if (game === "eurojackpot") config = { count: 5, range: 50, super: [1, 12, 2] };
-
-    let numbers = [];
-
-    while (numbers.length < config.count) {
-      let num = Math.floor(Math.random() * config.range) + 1;
-      if (!numbers.includes(num)) numbers.push(num);
-    }
-
-    // Randomize each number with ±1–19, but check bounds
-    numbers = numbers.map(n => {
-      let offset = Math.floor(Math.random() * 39) - 19; // range -19 to +19
-      let newVal = n + offset;
-      while (newVal < 1 || newVal > config.range) {
-        offset = Math.floor(Math.random() * 39) - 19;
-        newVal = n + offset;
+  <script>
+    let texts = {
+      de: {
+        gameLabel: "Wählen Sie ein Spiel:",
+        resultPrefix: "Ergebnis:"
+      },
+      tr: {
+        gameLabel: "Bir oyun seçin:",
+        resultPrefix: "Sonuç:"
+      },
+      en: {
+        gameLabel: "Choose a game:",
+        resultPrefix: "Result:"
       }
-      return newVal;
-    });
+    };
 
-    let superNumbers = [];
-    if (config.super) {
-      const superRange = config.super[1];
-      const count = config.super[2] || 1;
-      while (superNumbers.length < count) {
-        let sn = Math.floor(Math.random() * superRange) + config.super[0];
-        if (!superNumbers.includes(sn)) superNumbers.push(sn);
+    let lang = "de";  // Standard-Sprache ist Deutsch
+
+    // Event-Listener für die Sprachwahl
+    document.getElementById("languageBtn").addEventListener("click", setLanguage);
+
+    // Event-Listener für den Generieren-Button (mit touchend für mobile Geräte)
+    document.getElementById("generateBtn").addEventListener("click", generateNumbers);
+    document.getElementById("generateBtn").addEventListener("touchend", generateNumbers);
+
+    function setLanguage() {
+      lang = document.getElementById("languageSelector").value;
+      
+      // Aktualisiere das Text basierend auf der gewählten Sprache
+      document.getElementById("gameLabel").innerText = texts[lang].gameLabel;
+      document.getElementById("resultSection").style.display = "block";
+      document.getElementById("languageSelection").style.display = "none";
+      document.getElementById("gameSection").style.display = "block";
+    }
+
+    function generateNumbers() {
+      const game = document.getElementById("gameSelector").value;
+
+      let config = {};
+      if (game === "sans") config = { count: 5, range: 34, super: [1, 14] };
+      if (game === "super") config = { count: 6, range: 60 };
+      if (game === "sayisal") config = { count: 6, range: 90, super: [1, 90] };
+      if (game === "deLotto") config = { count: 6, range: 49, super: [0, 9] };
+      if (game === "eurojackpot") config = { count: 5, range: 50, super: [1, 12, 2] };
+
+      const generateUniqueNumbers = (count, min, max) => {
+        const numbers = new Set();
+        while (numbers.size < count) {
+          let num = Math.floor(Math.random() * (max - min + 1)) + min;
+
+          // Zufällige Verschiebung von ±1 bis ±19
+          let offset = Math.floor(Math.random() * 39) - 19;
+          let newVal = num + offset;
+
+          while (newVal < min || newVal > max || numbers.has(newVal)) {
+            offset = Math.floor(Math.random() * 39) - 19;
+            newVal = num + offset;
+          }
+
+          numbers.add(newVal);
+        }
+        return Array.from(numbers).sort((a, b) => a - b);
+      };
+
+      const mainNumbers = generateUniqueNumbers(config.count, 1, config.range);
+      let superNumbers = [];
+
+      if (config.super) {
+        const [min, max, amount = 1] = config.super;
+        superNumbers = generateUniqueNumbers(amount, min, max);
+      }
+
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = "<h3>" + texts[lang].resultPrefix + "</h3>";
+
+      mainNumbers.forEach(n => {
+        const ball = document.createElement("div");
+        ball.className = "lotto-ball";
+        ball.textContent = n;
+        resultDiv.appendChild(ball);
+      });
+
+      if (superNumbers.length) {
+        const plus = document.createElement("div");
+        plus.innerHTML = "<br><strong>+</strong><br>";
+        resultDiv.appendChild(plus);
+
+        superNumbers.forEach(sn => {
+          const ball = document.createElement("div");
+          ball.className = "lotto-ball gold";
+          ball.textContent = sn;
+          resultDiv.appendChild(ball);
+        });
       }
     }
+  </script>
 
-    document.getElementById("result").innerText = texts[lang].resultPrefix + " " +
-      numbers.join("-") + (superNumbers.length ? " + " + superNumbers.join(",") : "");
-  }
-</script>
 </body>
 </html>
